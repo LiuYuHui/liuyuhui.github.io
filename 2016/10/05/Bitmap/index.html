@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="default">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"liuyuhui.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="Bitmap是一种很省内存的数据结构，其每一个比特位都代表一个数字是否存在。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Bitmap">
+<meta property="og:url" content="http://liuyuhui.github.io/2016/10/05/Bitmap/index.html">
+<meta property="og:site_name" content="progress">
+<meta property="og:description" content="Bitmap是一种很省内存的数据结构，其每一个比特位都代表一个数字是否存在。">
+<meta property="article:published_time" content="2016-10-05T06:52:25.000Z">
+<meta property="article:modified_time" content="2020-07-27T02:30:40.267Z">
+<meta property="article:author" content="liuyuhui">
+<meta property="article:tag" content="数据结构">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://liuyuhui.github.io/2016/10/05/Bitmap/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'default'
+  };
+</script>
+
+  <title>Bitmap | progress</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">progress</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">I'd rather be anything but ordinary</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="default">
+    <link itemprop="mainEntityOfPage" href="http://liuyuhui.github.io/2016/10/05/Bitmap/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="liuyuhui">
+      <meta itemprop="description" content="This is my blog">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="progress">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Bitmap
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2016-10-05 14:52:25" itemprop="dateCreated datePublished" datetime="2016-10-05T14:52:25+08:00">2016-10-05</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-07-27 10:30:40" itemprop="dateModified" datetime="2020-07-27T10:30:40+08:00">2020-07-27</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/dsa/" itemprop="url" rel="index"><span itemprop="name">dsa</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>Bitmap是一种很省内存的数据结构，其每一个比特位都代表一个数字是否存在。</p>
+<a id="more"></a>以下是主要的成员函数
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">set</span><span class="params">(<span class="keyword">int</span> k)</span></span>;<span class="comment">//将整数k加入当前序列</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">clear</span><span class="params">(<span class="keyword">int</span> k)</span></span>;<span class="comment">//将整数k从当前序列清除</span></span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">test</span><span class="params">(<span class="keyword">int</span> k)</span></span>;<span class="comment">//判断整数k是否属于当前集合</span></span><br></pre></td></tr></table></figure>
+<p>以下是一种可行的实现方式</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Bitmap</span>&#123;</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">   <span class="keyword">char</span> *M;<span class="keyword">int</span> N;<span class="comment">//比特图所存放的空间M,容量为N*sizeof(char)*8</span></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">init</span><span class="params">(<span class="keyword">int</span> n)</span></span>&#123;</span><br><span class="line">        M =<span class="keyword">new</span> <span class="keyword">char</span>[N=(n+<span class="number">7</span>)/<span class="number">8</span>];</span><br><span class="line">        <span class="built_in">memset</span>(M, <span class="number">0</span>, N);</span><br><span class="line">    &#125;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Bitmap(<span class="keyword">int</span> n=<span class="number">8</span>)&#123; init(n);&#125;</span><br><span class="line">    ~Bitmap()&#123; <span class="keyword">delete</span> [] M;</span><br><span class="line">        M = <span class="literal">NULL</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">set</span><span class="params">(<span class="keyword">int</span> k )</span></span>&#123; expand(k);</span><br><span class="line">        M[k &gt;&gt; <span class="number">3</span>] |= (<span class="number">0x80</span>) &gt;&gt; (k &amp; <span class="number">0x07</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">clear</span><span class="params">(<span class="keyword">int</span> k)</span></span>&#123;</span><br><span class="line">        expand(k);</span><br><span class="line">         M[k &gt;&gt; <span class="number">3</span>] &amp;= ~(<span class="number">0x80</span> &gt;&gt; (k &amp; <span class="number">0x07</span>));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">test</span><span class="params">(<span class="keyword">int</span> k)</span></span>&#123;</span><br><span class="line">        expand(k);</span><br><span class="line">        <span class="keyword">return</span> M[k &gt;&gt; <span class="number">3</span>] &amp; (<span class="number">0x80</span> &gt;&gt; (k &amp; <span class="number">0x07</span>));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">expand</span><span class="params">(<span class="keyword">int</span> k)</span></span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(k&lt;<span class="number">8</span>*N)  <span class="keyword">return</span>;</span><br><span class="line">        <span class="keyword">int</span> oldN = N; <span class="keyword">char</span> *oldM = M;</span><br><span class="line">        init(<span class="number">2</span> * k);</span><br><span class="line">        <span class="built_in">memcpy</span>(M,oldM,oldN);</span><br><span class="line">        <span class="keyword">delete</span>[] oldM;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>M是存储数据的集合，之所以采用char,也是从节省内存的角度考虑，因为char型仅仅占据一个字节。N为数组大小，不过容量要比N要大，为N<em>sizeof(char)</em>8.通过移位操作k&gt;&gt;3可确定对应比特位所属字节所对应的秩，以00000100为例，其移位后变为00000000，其实可以从另一角度理解，k&gt;&gt;3相当于k/8，自然0&lt;=k&lt;=7的都在k[0]中。k &amp; 0x07有上面易知，其代表0x07的二进制表示是00000111，k假设是00001000,即k=8,发现结果是00000000，k=9时，结果是00000001，可以知道k&amp;0x07代表k对应比特位在该字节的位置，之后的0x80 &gt;&gt; (k &amp; 0x07)就显得理所当然，是每个数字代表的掩码mask,若位于第一位其掩码位100000000，k|=mask,将掩码对应的位置置一,k&amp;=~mask，将掩码对应的比特位置零。k&amp;mask，求那个比特位是否为一。位运算是一种很灵活也很快的方法。是时候认真总结下位运算用法。另外因为这种寻秩访问的方式，令Bitmap类的三个操作都是$O(1)$的时间复杂度，所以不论是查找还是加入元素都很快。<br>以上这种虽然插入和删除很快，但是还有个地方很慢，就是对M的初始化，要对每个位置都置零，我们可以换种实现方法，以空间换时间，毕竟时间复杂度才是第一要素。以下先写出set和test的实现。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Bitmap</span>&#123;</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">  <span class="keyword">int</span> *F; <span class="keyword">int</span> N;</span><br><span class="line">  <span class="keyword">int</span> *T；<span class="keyword">int</span> top;</span><br><span class="line">  <span class="function"><span class="keyword">inline</span> <span class="keyword">bool</span> <span class="title">valid</span><span class="params">(<span class="keyword">int</span> r)</span></span>&#123;<span class="keyword">return</span> (<span class="number">0</span>&lt;=r)&amp;&amp;(r&lt;top);&#125;</span><br><span class="line">  Bitmap(<span class="keyword">int</span> n)&#123;</span><br><span class="line">    F = <span class="keyword">new</span> <span class="keyword">int</span>[N = n];</span><br><span class="line">    T = <span class="keyword">new</span> <span class="keyword">int</span>[N];</span><br><span class="line">    top = <span class="number">0</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  ~Bitmap()&#123;</span><br><span class="line">    <span class="keyword">delete</span>[] F, <span class="keyword">delete</span>[] T;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">inline</span> <span class="keyword">void</span> <span class="title">set</span><span class="params">(<span class="keyword">int</span> k)</span></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(test(k))</span><br><span class="line">      <span class="keyword">return</span>;</span><br><span class="line">    F[k] = top++;</span><br><span class="line">    T[F[k]] = k;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">inline</span> <span class="keyword">bool</span> <span class="title">test</span><span class="params">(<span class="keyword">int</span> k)</span></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> vaild(F[k]) &amp;&amp; T[F[k]] == k;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>F[]是用来存储每个数字对应栈的顺序，T[]中存储数位同时也是F[]中的秩，<br>此时F[]和T[]组成校验环，即T[F[k]]==k.我们还没实现clear，是否可以简单的调用set接口，将校验环置为-1，答案是不行，因为每次添加set,都会造成栈增加一，长此以来势必会造成栈溢出。<br>我们应该对曾经入栈的，又被删除的元素添加一标记，每次只对未入栈的元素进行栈加一。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Bitmap</span>&#123;</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">  <span class="keyword">int</span> *F; <span class="keyword">int</span> N;</span><br><span class="line">  <span class="keyword">int</span> *T；<span class="keyword">int</span> top;</span><br><span class="line">  <span class="function"><span class="keyword">inline</span> <span class="keyword">bool</span> <span class="title">valid</span><span class="params">(<span class="keyword">int</span> r)</span></span>&#123;<span class="keyword">return</span> (<span class="number">0</span>&lt;=r)&amp;&amp;(r&lt;top);&#125;</span><br><span class="line">  <span class="function"><span class="keyword">inline</span> <span class="keyword">bool</span> <span class="title">erased</span><span class="params">(<span class="keyword">int</span> r)</span></span>&#123; <span class="keyword">return</span> vaild(F[k]) &amp;&amp; !(T[F[k]] + <span class="number">1</span> + k); &#125;</span><br><span class="line">  Bitmap(<span class="keyword">int</span> n)&#123;</span><br><span class="line">    F = <span class="keyword">new</span> <span class="keyword">int</span>[N = n]; T = <span class="keyword">new</span> <span class="keyword">int</span>[N];</span><br><span class="line">    top = <span class="number">0</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  ~Bitmap()&#123;</span><br><span class="line">    <span class="keyword">delete</span>[] F, <span class="keyword">delete</span>[] T;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">inline</span> <span class="keyword">void</span> <span class="title">set</span><span class="params">(<span class="keyword">int</span> k)</span></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(test(k))  <span class="keyword">return</span>;</span><br><span class="line">    <span class="keyword">if</span>(!erased(k))</span><br><span class="line">    F[k] = top++;  T[F[k]] = k;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">inline</span> <span class="keyword">bool</span> <span class="title">test</span><span class="params">(<span class="keyword">int</span> k)</span></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> vaild(F[k]) &amp;&amp; T[F[k]] == k;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">inline</span> <span class="keyword">void</span> <span class="title">valid</span><span class="params">(<span class="keyword">int</span> k)</span></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(test(k)) T[F[k]] = <span class="number">-1</span> - k;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" rel="tag"># 数据结构</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2016/10/03/%E8%B4%AA%E5%BF%83/" rel="prev" title="第一篇文章">
+      <i class="fa fa-chevron-left"></i> 第一篇文章
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2016/10/18/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/" rel="next" title="动态规划">
+      动态规划 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">liuyuhui</p>
+  <div class="site-description" itemprop="description">This is my blog</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">16</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">liuyuhui</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

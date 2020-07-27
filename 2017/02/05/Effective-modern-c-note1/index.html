@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="default">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"liuyuhui.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="Deducing TypesItem 1:Understand template type deduction">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Effective modern c++ note1">
+<meta property="og:url" content="http://liuyuhui.github.io/2017/02/05/Effective-modern-c-note1/index.html">
+<meta property="og:site_name" content="progress">
+<meta property="og:description" content="Deducing TypesItem 1:Understand template type deduction">
+<meta property="article:published_time" content="2017-02-05T01:26:10.000Z">
+<meta property="article:modified_time" content="2020-07-27T02:30:40.267Z">
+<meta property="article:author" content="liuyuhui">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://liuyuhui.github.io/2017/02/05/Effective-modern-c-note1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'default'
+  };
+</script>
+
+  <title>Effective modern c++ note1 | progress</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">progress</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">I'd rather be anything but ordinary</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="default">
+    <link itemprop="mainEntityOfPage" href="http://liuyuhui.github.io/2017/02/05/Effective-modern-c-note1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="liuyuhui">
+      <meta itemprop="description" content="This is my blog">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="progress">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Effective modern c++ note1
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2017-02-05 09:26:10" itemprop="dateCreated datePublished" datetime="2017-02-05T09:26:10+08:00">2017-02-05</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-07-27 10:30:40" itemprop="dateModified" datetime="2020-07-27T10:30:40+08:00">2020-07-27</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="Deducing-Types"><a href="#Deducing-Types" class="headerlink" title="Deducing Types"></a>Deducing Types</h2><h3 id="Item-1-Understand-template-type-deduction"><a href="#Item-1-Understand-template-type-deduction" class="headerlink" title="Item 1:Understand template type deduction"></a>Item 1:Understand template type deduction</h3><a id="more"></a>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f</span><span class="params">(ParamType param)</span></span>;</span><br><span class="line"></span><br><span class="line">f(expr);</span><br></pre></td></tr></table></figure>
+
+<p>there are three cases:</p>
+<blockquote>
+<p>1.ParamType is a pointer or reference type,but not a universal reference.</p>
+</blockquote>
+<blockquote>
+<p>2.ParamType is a universal reference.</p>
+</blockquote>
+<blockquote>
+<p>3.ParamType is neither a pointer nor a reference.</p>
+</blockquote>
+<h4 id="Case1-ParamType-is-a-pointer-or-reference-type-but-not-a-universal-reference"><a href="#Case1-ParamType-is-a-pointer-or-reference-type-but-not-a-universal-reference" class="headerlink" title="Case1.ParamType is a pointer or reference type,but not a universal reference."></a>Case1.ParamType is a pointer or reference type,but not a universal reference.</h4><p>in this case,type deduction works likes this:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f</span><span class="params">(T &amp;param)</span></span>;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>1.If expr’s type is a reference,ignore the reference part.<br>2.Then pattern-match expr’s type against ParamType to determine T.</p>
+</blockquote>
+<p>we have these variable declarations.</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> x=<span class="number">27</span>;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> cx=x;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> &amp;rx=x;</span><br><span class="line">f(x);<span class="comment">//T is int,param's type is int&amp;</span></span><br><span class="line">f(cx);<span class="comment">// T is const int,param's type is const int&amp;</span></span><br><span class="line">f(rx);<span class="comment">//T is const int,param's type is const int &amp;</span></span><br></pre></td></tr></table></figure>
+<p>If we change the type of f’s parameter from T&amp; to const T&amp;,the <code>constness</code> of cx and rx continues to be respected.</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f</span><span class="params">(<span class="keyword">const</span> T&amp; param)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> x=<span class="number">27</span>;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> cx=x;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span>&amp; rx=x;</span><br><span class="line">f(x);<span class="comment">//T is int,param's type is const int&amp;</span></span><br><span class="line">f(cx);<span class="comment">//T is int,param's type is const int&amp;</span></span><br><span class="line">f(rx);<span class="comment">//T is int,param's type is const int&amp;</span></span><br></pre></td></tr></table></figure>
+<p>if param were a pointer (or a pointer to const) instead of a reference,things would work essentially the same way.</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f</span><span class="params">(T* param)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> x=<span class="number">27</span>;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> *px=x;</span><br><span class="line"></span><br><span class="line">f(&amp;x);<span class="comment">//T is int,param's type is int*</span></span><br><span class="line">f(px);<span class="comment">//T is const in,param's type is const int*</span></span><br></pre></td></tr></table></figure>
+<h4 id="Case-2-ParamType-is-a-Universal-Reference"><a href="#Case-2-ParamType-is-a-Universal-Reference" class="headerlink" title="Case 2:ParamType is a Universal Reference"></a>Case 2:ParamType is a Universal Reference</h4><ul>
+<li>If <code>expr</code> is an lvalue,both T and paramType are deduced to be lvalue reference.</li>
+<li>if <code>expr</code> is an rvalue,the “normal” rules apply.</li>
+</ul>
+<p>for example:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f</span><span class="params">(T&amp;&amp; param)</span></span>;</span><br><span class="line">f(x);<span class="comment">//x is lvalue,so T is int&amp;,param's type also is</span></span><br><span class="line"></span><br><span class="line">f(cx);<span class="comment">//T and param's type both are const int&amp;</span></span><br><span class="line"></span><br><span class="line">f(rx);<span class="comment">//T and param's type both are const int&amp;</span></span><br><span class="line"></span><br><span class="line">f(<span class="number">27</span>);<span class="comment">//27 is rvalue,so T is int,param's type is int&amp;&amp;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="Case-3-ParamType-is-Neither-a-Pointer-nor-a-Reference"><a href="#Case-3-ParamType-is-Neither-a-Pointer-nor-a-Reference" class="headerlink" title="Case 3:ParamType is Neither a Pointer nor a Reference"></a>Case 3:ParamType is Neither a Pointer nor a Reference</h4><p>In this case,we’re dealing with pass-by-value.</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f</span><span class="params">(T param)</span></span>;</span><br><span class="line">f(x);<span class="comment">//T's and param's type are both int</span></span><br><span class="line">f(cx);<span class="comment">//as below</span></span><br><span class="line">f(rx);<span class="comment">//as below</span></span><br></pre></td></tr></table></figure>
+
+<p>It’s easy to deal with this case,just ignore the reference ,const,volatile part.but we need recognize that const is ignored only for by-value parameters.<br>for example:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f</span><span class="params">(T param)</span></span>;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">char</span>* <span class="keyword">const</span> ptr=<span class="string">"fun with pointers"</span>;<span class="comment">//ptr is const pointer to const object</span></span><br><span class="line">f(ptr);<span class="comment">//pass arg of type const type const char* const</span></span><br></pre></td></tr></table></figure>
+
+<p>as we know,the const to the right of asterisk declares ptr to be const:ptr can’t be be made to point to a different location,nor can’t it be set to null.the const to the left of asterisk says that what ptr points to is const,hence can’t be modified.<br>so in accord with the type deduction rule for by-value parameters,the <code>constness</code> of ptr will be ignored,the type deduced for param will be <code>cosnt char</code>.</p>
+<h4 id="Array-Arguments"><a href="#Array-Arguments" class="headerlink" title="Array Arguments"></a>Array Arguments</h4><p>As we know,array types are different from pointer types,in many contexts,an array <code>decays</code> into a pointer to its first element.<br>for example:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">char</span> name[]=<span class="string">"TestName"</span>;<span class="comment">//const char[8]</span></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">char</span>* ptrToName=name;<span class="comment">//const char *</span></span><br></pre></td></tr></table></figure>
+<p>if we pass an array to a template taking a by-value parameter,array type decays poninter,but if we pass references to arrays,what happens?</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f</span><span class="params">(T&amp; param)</span></span>;</span><br><span class="line"></span><br><span class="line">f(name);<span class="comment">//T's type is const char [8],and param's type is const char(&amp;)[8]</span></span><br></pre></td></tr></table></figure>
+<p>the ablitiy to declare references to arrays enables creation of a template that deduces the number of elements that an aray contains:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T，<span class="built_in">std</span>::<span class="keyword">size_t</span> N&gt;</span><br><span class="line"><span class="function"><span class="keyword">constexpr</span> <span class="built_in">std</span>::<span class="keyword">size_t</span> <span class="title">arraySize</span><span class="params">(T (&amp;)[N])</span> noexpect</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> N; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2017/01/07/%E4%B8%8D%E8%A6%81%E5%9C%A8%E7%9F%A5%E4%B9%8E%E9%97%AE%E4%BD%9C%E4%B8%9A%EF%BC%81/" rel="prev" title="不要在知乎问作业！">
+      <i class="fa fa-chevron-left"></i> 不要在知乎问作业！
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2017/03/13/C-variadic-template/" rel="next" title="C++ variadic template">
+      C++ variadic template <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Deducing-Types"><span class="nav-number">1.</span> <span class="nav-text">Deducing Types</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Item-1-Understand-template-type-deduction"><span class="nav-number">1.1.</span> <span class="nav-text">Item 1:Understand template type deduction</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Case1-ParamType-is-a-pointer-or-reference-type-but-not-a-universal-reference"><span class="nav-number">1.1.1.</span> <span class="nav-text">Case1.ParamType is a pointer or reference type,but not a universal reference.</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Case-2-ParamType-is-a-Universal-Reference"><span class="nav-number">1.1.2.</span> <span class="nav-text">Case 2:ParamType is a Universal Reference</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Case-3-ParamType-is-Neither-a-Pointer-nor-a-Reference"><span class="nav-number">1.1.3.</span> <span class="nav-text">Case 3:ParamType is Neither a Pointer nor a Reference</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Array-Arguments"><span class="nav-number">1.1.4.</span> <span class="nav-text">Array Arguments</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">liuyuhui</p>
+  <div class="site-description" itemprop="description">This is my blog</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">16</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">liuyuhui</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
