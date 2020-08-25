@@ -27,7 +27,7 @@
 <meta property="og:site_name" content="progress">
 <meta property="og:description" content="GSoC 2020 have almost come to an end, this blog summarizes what I have done before GSoC’s final evaluation. There are three things that I want to introduce.  Composite class to combinate multiple mach">
 <meta property="article:published_time" content="2020-08-25T01:07:12.000Z">
-<meta property="article:modified_time" content="2020-08-25T03:05:12.635Z">
+<meta property="article:modified_time" content="2020-08-25T03:08:54.135Z">
 <meta property="article:author" content="liuyuhui">
 <meta name="twitter:card" content="summary">
 
@@ -174,7 +174,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2020-08-25 09:07:12 / Modified: 11:05:12" itemprop="dateCreated datePublished" datetime="2020-08-25T09:07:12+08:00">2020-08-25</time>
+              <time title="Created: 2020-08-25 09:07:12 / Modified: 11:08:54" itemprop="dateCreated datePublished" datetime="2020-08-25T09:07:12+08:00">2020-08-25</time>
             </span>
 
           
@@ -199,7 +199,7 @@
 <p>The ensemble class now can combine multiple learning algorithms, but it don’t have a good interface to<br>use, so I write a composite class with good interface to wrap the ensemble class.<br>the basis usage of composite class is as follows:</p>
 <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">auto</span> composite = <span class="built_in">std</span>::make_shared&lt;Composite&gt;();</span><br><span class="line"><span class="keyword">auto</span> pred = composite-&gt;over(<span class="built_in">std</span>::make_shared&lt;MulticlassLibLinear&gt;())</span><br><span class="line">	                 -&gt;over(<span class="built_in">std</span>::make_shared&lt;MulticlassOCAS&gt;())</span><br><span class="line">	                 -&gt;then(<span class="built_in">std</span>::make_shared&lt;MeanRule&gt;())</span><br><span class="line">	                    -&gt;train(train_feats, train_labels)</span><br><span class="line">	                    -&gt;apply_multiclass(test_feats);</span><br></pre></td></tr></table></figure>
 <p>And we can make composite became more nice, since Transformer and Pipeline have been added to shogun,<br>we can combine those together. First we use transformer to transform data(such as normlize data), then<br>we can combine multiple algorithms to do predict/regress task.</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">auto</span> pipeline = <span class="built_in">std</span>::make_shared&lt;PipelineBuilder&gt;();</span><br><span class="line"><span class="keyword">auto</span> pred = pipeline -&gt;over(<span class="built_in">std</span>::make_shared&lt;NormOne&gt;())</span><br><span class="line">			 	        	-&gt;composite()</span><br><span class="line">				 	        	-&gt;over(<span class="built_in">std</span>::make_shared&lt;MulticlassLibLinear&gt;())</span><br><span class="line">                                -&gt;over(<span class="built_in">std</span>::make_shared&lt;MulticlassOCAS&gt;())</span><br><span class="line">	                        	-&gt;then(<span class="built_in">std</span>::make_shared&lt;MeanRule&gt;())</span><br><span class="line">	                	    		-&gt;train(train_feats, train_labels)</span><br><span class="line">                                    -&gt;apply_multiclass(test_feats);</span><br></pre></td></tr></table></figure>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">auto</span> pipeline = <span class="built_in">std</span>::make_shared&lt;PipelineBuilder&gt;();</span><br><span class="line"><span class="keyword">auto</span> pred = pipeline -&gt;over(<span class="built_in">std</span>::make_shared&lt;NormOne&gt;())</span><br><span class="line">                        -&gt;composite()</span><br><span class="line">                            -&gt;over(<span class="built_in">std</span>::make_shared&lt;MulticlassLibLinear&gt;())</span><br><span class="line">                            -&gt;over(<span class="built_in">std</span>::make_shared&lt;MulticlassOCAS&gt;())</span><br><span class="line">                                -&gt;then(<span class="built_in">std</span>::make_shared&lt;MeanRule&gt;())</span><br><span class="line">                                    -&gt;train(train_feats, train_labels)</span><br><span class="line">                                    -&gt;apply_multiclass(test_feats);</span><br></pre></td></tr></table></figure>
 
     </div>
 
