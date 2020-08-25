@@ -20,16 +20,18 @@
     var CONFIG = {"hostname":"liuyuhui.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="This is my blog">
-<meta property="og:type" content="website">
-<meta property="og:title" content="progress">
-<meta property="og:url" content="http://liuyuhui.github.io/tags/dp/index.html">
+  <meta name="description" content="GSoC 2020 have almost come to an end, this blog summarizes what I have done before GSoC’s final evaluation. There are three things that I want to introduce.  Composite class to combinate multiple mach">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GSoC Final Evaluations">
+<meta property="og:url" content="http://liuyuhui.github.io/2020/08/25/GSoC-Final-Evaluations/index.html">
 <meta property="og:site_name" content="progress">
-<meta property="og:description" content="This is my blog">
+<meta property="og:description" content="GSoC 2020 have almost come to an end, this blog summarizes what I have done before GSoC’s final evaluation. There are three things that I want to introduce.  Composite class to combinate multiple mach">
+<meta property="article:published_time" content="2020-08-25T01:07:12.000Z">
+<meta property="article:modified_time" content="2020-08-25T03:01:59.551Z">
 <meta property="article:author" content="liuyuhui">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://liuyuhui.github.io/tags/dp/">
+<link rel="canonical" href="http://liuyuhui.github.io/2020/08/25/GSoC-Final-Evaluations/">
 
 
 <script id="page-configurations">
@@ -37,12 +39,12 @@
   CONFIG.page = {
     sidebar: "",
     isHome : false,
-    isPost : false,
+    isPost : true,
     lang   : 'default'
   };
 </script>
 
-  <title>Tag: dp | progress</title>
+  <title>GSoC Final Evaluations | progress</title>
   
 
 
@@ -141,51 +143,88 @@
         <div class="content-wrap">
           
 
-          <div class="content tag">
+          <div class="content post posts-expand">
             
 
+    
   
   
-  
-  <div class="post-block">
-    <div class="posts-collapse">
-      <div class="collection-title">
-        <h2 class="collection-header">dp
-          <small>Tag</small>
-        </h2>
-      </div>
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="default">
+    <link itemprop="mainEntityOfPage" href="http://liuyuhui.github.io/2020/08/25/GSoC-Final-Evaluations/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="liuyuhui">
+      <meta itemprop="description" content="This is my blog">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="progress">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          GSoC Final Evaluations
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2020-08-25 09:07:12 / Modified: 11:01:59" itemprop="dateCreated datePublished" datetime="2020-08-25T09:07:12+08:00">2020-08-25</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
-    <div class="collection-year">
-      <span class="collection-header">2017</span>
+        <p>GSoC 2020 have almost come to an end, this blog summarizes what I have done before GSoC’s final evaluation. There are three things that I want to introduce.</p>
+<ul>
+<li>Composite class to combinate multiple machine learning algorithms</li>
+<li>Suggest class name if class name not found</li>
+<li>CrossValidation wrapper</li>
+</ul>
+<h2 id="Composite-class-to-composite-multiple-machine-learning-algorithm"><a href="#Composite-class-to-composite-multiple-machine-learning-algorithm" class="headerlink" title="Composite class to composite multiple machine learning algorithm"></a>Composite class to composite multiple machine learning algorithm</h2><p>Ensemble methods use multiple learning algorithms to obtain better predictive performance, shogun have many machine learning algorithms, but it don’t have a good<br>way to combinate those machine algorithms, so I write an Ensemble class to do this.<br>the basis usage of it is as follows:</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">auto</span> ensemble = <span class="built_in">std</span>::make_shared&lt;EnsembleMachine&gt;(lists);</span><br><span class="line">ensemble-&gt;add_machine(<span class="built_in">std</span>::make_shared&lt;MulticlassLibLinear&gt;());</span><br><span class="line">ensemble-&gt;add_machine(<span class="built_in">std</span>::make_shared&lt;MulticlassOCAS&gt;());</span><br><span class="line">ensemble-&gt;set_combination_rule(<span class="built_in">std</span>::make_shared&lt;MeanRule&gt;());</span><br><span class="line">ensemble-&gt;train(train_feats, train_labels);</span><br></pre></td></tr></table></figure>
+<p>The ensemble class now can combine multiple learning algorithms, but it don’t have a good interface to<br>use, so I write a composite class with good interface to wrap the ensemble class.<br>the basis usage of composite class is as follows:</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">auto</span> composite = <span class="built_in">std</span>::make_shared&lt;Composite&gt;();</span><br><span class="line"><span class="keyword">auto</span> pred = composite-&gt;over(<span class="built_in">std</span>::make_shared&lt;MulticlassLibLinear&gt;())</span><br><span class="line">	                 -&gt;over(<span class="built_in">std</span>::make_shared&lt;MulticlassOCAS&gt;())</span><br><span class="line">	                 -&gt;then(<span class="built_in">std</span>::make_shared&lt;MeanRule&gt;())</span><br><span class="line">	                    -&gt;train(train_feats, train_labels)</span><br><span class="line">	                    -&gt;apply_multiclass(test_feats);</span><br></pre></td></tr></table></figure>
+<p>And we can make composite became more nice, since Transformer and Pipeline have been added to shogun,<br>we can combine those together. First we use transformer to transform data(such as normlize data), then<br>we can combine multiple algorithms to do predict/regress task.</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">auto</span> pipeline = <span class="built_in">std</span>::make_shared&lt;PipelineBuilder&gt;();</span><br><span class="line"><span class="keyword">auto</span> pred = pipeline -&gt;over(<span class="built_in">std</span>::make_shared&lt;NormOne&gt;())</span><br><span class="line">			 	        	-&gt;composite()</span><br><span class="line">				 	        	-&gt;over(<span class="built_in">std</span>::make_shared&lt;MulticlassLibLinear&gt;())</span><br><span class="line">	            				-&gt;over(<span class="built_in">std</span>::make_shared&lt;MulticlassOCAS&gt;())</span><br><span class="line">	                        	-&gt;then(<span class="built_in">std</span>::make_shared&lt;MeanRule&gt;())</span><br><span class="line">	                	    		-&gt;train(train_feats, train_labels)</span><br><span class="line">	                		   		-&gt;apply_multiclass(test_feats);</span><br></pre></td></tr></table></figure>
+
     </div>
 
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+    
+    
+    
 
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2017-04-29T21:09:29+08:00"
-              content="2017-04-29">
-          04-29
-        </time>
-      </div>
+      <footer class="post-footer">
 
-      <div class="post-title">
-          <a class="post-title-link" href="/2017/04/29/%E6%9C%80%E5%A4%A7M%E5%AD%90%E6%AE%B5%E5%92%8C/" itemprop="url">
-            <span itemprop="name">最大M子段和</span>
-          </a>
-      </div>
+        
 
-    </header>
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/07/25/GSoC-Second-Evaluations/" rel="prev" title="GSoC Second Evaluations">
+      <i class="fa fa-chevron-left"></i> GSoC Second Evaluations
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
   </article>
-
-    </div>
-  </div>
   
   
-  
-
   
 
 
@@ -238,6 +277,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Composite-class-to-composite-multiple-machine-learning-algorithm"><span class="nav-number">1.</span> <span class="nav-text">Composite class to composite multiple machine learning algorithm</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 

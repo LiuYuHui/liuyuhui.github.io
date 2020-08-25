@@ -147,6 +147,76 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="default">
+    <link itemprop="mainEntityOfPage" href="http://liuyuhui.github.io/2020/08/25/GSoC-Final-Evaluations/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="liuyuhui">
+      <meta itemprop="description" content="This is my blog">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="progress">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/08/25/GSoC-Final-Evaluations/" class="post-title-link" itemprop="url">GSoC Final Evaluations</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2020-08-25 09:07:12 / Modified: 11:01:59" itemprop="dateCreated datePublished" datetime="2020-08-25T09:07:12+08:00">2020-08-25</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>GSoC 2020 have almost come to an end, this blog summarizes what I have done before GSoC’s final evaluation. There are three things that I want to introduce.</p>
+<ul>
+<li>Composite class to combinate multiple machine learning algorithms</li>
+<li>Suggest class name if class name not found</li>
+<li>CrossValidation wrapper</li>
+</ul>
+<h2 id="Composite-class-to-composite-multiple-machine-learning-algorithm"><a href="#Composite-class-to-composite-multiple-machine-learning-algorithm" class="headerlink" title="Composite class to composite multiple machine learning algorithm"></a>Composite class to composite multiple machine learning algorithm</h2><p>Ensemble methods use multiple learning algorithms to obtain better predictive performance, shogun have many machine learning algorithms, but it don’t have a good<br>way to combinate those machine algorithms, so I write an Ensemble class to do this.<br>the basis usage of it is as follows:</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">auto</span> ensemble = <span class="built_in">std</span>::make_shared&lt;EnsembleMachine&gt;(lists);</span><br><span class="line">ensemble-&gt;add_machine(<span class="built_in">std</span>::make_shared&lt;MulticlassLibLinear&gt;());</span><br><span class="line">ensemble-&gt;add_machine(<span class="built_in">std</span>::make_shared&lt;MulticlassOCAS&gt;());</span><br><span class="line">ensemble-&gt;set_combination_rule(<span class="built_in">std</span>::make_shared&lt;MeanRule&gt;());</span><br><span class="line">ensemble-&gt;train(train_feats, train_labels);</span><br></pre></td></tr></table></figure>
+<p>The ensemble class now can combine multiple learning algorithms, but it don’t have a good interface to<br>use, so I write a composite class with good interface to wrap the ensemble class.<br>the basis usage of composite class is as follows:</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">auto</span> composite = <span class="built_in">std</span>::make_shared&lt;Composite&gt;();</span><br><span class="line"><span class="keyword">auto</span> pred = composite-&gt;over(<span class="built_in">std</span>::make_shared&lt;MulticlassLibLinear&gt;())</span><br><span class="line">	                 -&gt;over(<span class="built_in">std</span>::make_shared&lt;MulticlassOCAS&gt;())</span><br><span class="line">	                 -&gt;then(<span class="built_in">std</span>::make_shared&lt;MeanRule&gt;())</span><br><span class="line">	                    -&gt;train(train_feats, train_labels)</span><br><span class="line">	                    -&gt;apply_multiclass(test_feats);</span><br></pre></td></tr></table></figure>
+<p>And we can make composite became more nice, since Transformer and Pipeline have been added to shogun,<br>we can combine those together. First we use transformer to transform data(such as normlize data), then<br>we can combine multiple algorithms to do predict/regress task.</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">auto</span> pipeline = <span class="built_in">std</span>::make_shared&lt;PipelineBuilder&gt;();</span><br><span class="line"><span class="keyword">auto</span> pred = pipeline -&gt;over(<span class="built_in">std</span>::make_shared&lt;NormOne&gt;())</span><br><span class="line">			 	        	-&gt;composite()</span><br><span class="line">				 	        	-&gt;over(<span class="built_in">std</span>::make_shared&lt;MulticlassLibLinear&gt;())</span><br><span class="line">	            				-&gt;over(<span class="built_in">std</span>::make_shared&lt;MulticlassOCAS&gt;())</span><br><span class="line">	                        	-&gt;then(<span class="built_in">std</span>::make_shared&lt;MeanRule&gt;())</span><br><span class="line">	                	    		-&gt;train(train_feats, train_labels)</span><br><span class="line">	                		   		-&gt;apply_multiclass(test_feats);</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="default">
     <link itemprop="mainEntityOfPage" href="http://liuyuhui.github.io/2020/07/25/GSoC-Second-Evaluations/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -404,13 +474,13 @@
 
       
           <h2 id="This-is-my-first-blog-aboud-GSoC"><a href="#This-is-my-first-blog-aboud-GSoC" class="headerlink" title="This is my first blog aboud GSoC"></a>This is my first blog aboud GSoC</h2><p>Currently, the shogun <code>Machine</code> base class has two main class member functions: <code>train</code> and <code>apply</code>. The current usage is:</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">shared_ptr</span>&lt;Features&gt; train_data;</span><br><span class="line"><span class="built_in">shared_ptr</span>&lt;Labels&gt; train_labels;</span><br><span class="line"><span class="keyword">auto</span> clf = create&lt;LeastSquaresRegression&gt;();</span><br><span class="line">clf-&gt;set_labels(train_labels);</span><br><span class="line">clf-&gt;set_features(train_data);</span><br><span class="line">clf-&gt;train();</span><br></pre></td></tr></table></figure>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="built_in">shared_ptr</span>&lt;Features&gt; train_data;</span><br><span class="line"><span class="built_in">shared_ptr</span>&lt;Labels&gt; train_labels;</span><br><span class="line"><span class="keyword">auto</span> clf = create&lt;LeastSquaresRegression&gt;();</span><br><span class="line">clf-&gt;set_labels(train_labels);</span><br><span class="line">clf-&gt;set_features(train_data);</span><br><span class="line">clf-&gt;train();</span><br></pre></td></tr></table></figure>
 <p>The <code>Machine</code> class is stateful, which makes people confused about which <code>features</code> and <code>labels</code> are trained. <code>Features</code> and <code>Labels</code> should not be stored in the object, so I started by refactoring this class to make it stateless.<br>The usage of the new API should look like this:</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> test_labels = create&lt;LeastSquaresRegression&gt;()</span><br><span class="line">                        -&gt;fit(train_features, train_labels)</span><br><span class="line">                        -&gt;predict(test_data);</span><br></pre></td></tr></table></figure>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">auto</span> test_labels = create&lt;LeastSquaresRegression&gt;()</span><br><span class="line">                        -&gt;fit(train_features, train_labels)</span><br><span class="line">                        -&gt;predict(test_data);</span><br></pre></td></tr></table></figure>
 <p>First, we need to refactor all classes that are derived from <code>Machine</code>. The first step is to find all the lines of code where the class accesses <code>m_labels</code>.</p>
 <p>Shogun has a large code base, so it is very hard to simply find all the lines of code that make <code>Machine</code> stateful with respect to <code>m_labels</code>. So my mentors suggested that I use libtooling to find all these instances. Libtooling is a really powerfull tool, with a steep learning curve, used by the clang compiler to parse C++ code. After about one week, I have finally written this script.</p>
 <p>The main matcher is <code>memberExpr(member(hasName(&quot;m_labels&quot;))).bind(&quot;func&quot;)</code>, then we can get the AST of the <code>MemberExpr</code>. However, just printing all the lines of the <code>MemberExpr</code> is not readable. We should add more context, such as class name, method name. The LLVM AST has builtin functionality that helped me find the method and class names. We can use <code>getParents</code> to get <code>CXXMethodDecl</code>, and when we get <code>CXXMethodDecl</code>, it is easy to use <code>getParent</code> to get <code>CXXRecordDecl</code>. But the story does not end here, we only want to get every <code>CXXRecordDecl</code> that are derived from <code>Machine</code>. We have to restrict the base of the found <code>CXXRecordDecl</code> to be derived from <code>Machine</code>.</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> record = method-&gt;getParent();</span><br><span class="line"><span class="keyword">bool</span> is_derived_from_machine = <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">llvm::SmallPtrSet&lt;<span class="keyword">const</span> CXXRecordDecl *, <span class="number">4</span>&gt; Bases;</span><br><span class="line"><span class="keyword">auto</span> Collect = [&amp;Bases](<span class="keyword">const</span> CXXRecordDecl *Base) &#123;</span><br><span class="line">  Bases.insert(Base);</span><br><span class="line">  <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;;</span><br><span class="line">record-&gt;forallBases(Collect);</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">auto</span> &amp;&amp;base : Bases)</span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">if</span> (base-&gt;getNameAsString() == <span class="string">"Machine"</span>)</span><br><span class="line">  &#123;</span><br><span class="line">    is_derived_from_machine = <span class="literal">true</span>;</span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">auto</span> record = method-&gt;getParent();</span><br><span class="line"><span class="keyword">bool</span> is_derived_from_machine = <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">llvm::SmallPtrSet&lt;<span class="keyword">const</span> CXXRecordDecl *, <span class="number">4</span>&gt; Bases;</span><br><span class="line"><span class="keyword">auto</span> Collect = [&amp;Bases](<span class="keyword">const</span> CXXRecordDecl *Base) &#123;</span><br><span class="line">  Bases.insert(Base);</span><br><span class="line">  <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;;</span><br><span class="line">record-&gt;forallBases(Collect);</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">auto</span> &amp;&amp;base : Bases)</span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">if</span> (base-&gt;getNameAsString() == <span class="string">"Machine"</span>)</span><br><span class="line">  &#123;</span><br><span class="line">    is_derived_from_machine = <span class="literal">true</span>;</span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h2 id="Related-PR"><a href="#Related-PR" class="headerlink" title="Related PR:"></a>Related PR:</h2><p><a href="https://github.com/shogun-toolbox/shogun-libtooling/pull/1" target="_blank" rel="noopener">#1</a></p>
 <h2 id="Thanks"><a href="#Thanks" class="headerlink" title="Thanks:"></a>Thanks:</h2><p><a href="github.com/gf712">gf712</a> helps me fix a lot of grammar errors of this post.</p>
 
@@ -797,78 +867,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="default">
-    <link itemprop="mainEntityOfPage" href="http://liuyuhui.github.io/2016/11/13/Sort/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="liuyuhui">
-      <meta itemprop="description" content="This is my blog">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="progress">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2016/11/13/Sort/" class="post-title-link" itemprop="url">Sort</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2016-11-13 14:34:50" itemprop="dateCreated datePublished" datetime="2016-11-13T14:34:50+08:00">2016-11-13</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-07-27 10:30:40" itemprop="dateModified" datetime="2020-07-27T10:30:40+08:00">2020-07-27</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>排序方法已经学了不少了，是时候总结下各种排序，
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2016/11/13/Sort/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -938,7 +936,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">16</span>
+          <span class="site-state-item-count">17</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
